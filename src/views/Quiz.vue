@@ -31,12 +31,19 @@
         </div>
         <h2>測驗結果</h2>
         <div class="result-content" style="font-weight: 600;">
-          <img :src="result.image" :alt="result.name" class="result-image">
+          <div class="result-image-container">
+            <div class="sparkles">
+              <div class="sparkle" v-for="n in 12" :key="n"></div>
+            </div>
+            <img :src="result.image" :alt="result.name" class="result-image">
+          </div>
           <h2>你是 {{ result.name }}！</h2>
           <p style="font-weight: 700;font-size: large;">{{ result.description }}</p>
         </div>
-        <button @click="restartQuiz" class="pill-button restart">重新測驗</button>
-        <div class="share-buttons">
+        <div class="button-container">
+          <button @click="restartQuiz" class="pill-button restart">
+            重新測驗
+          </button>
           <button @click="shareResult('facebook')" class="pill-button facebook">
             <img src="/images/facebook.png" alt="Facebook" class="share-icon">
             分享到 Facebook
@@ -318,82 +325,105 @@ const shareResult = (platform) => {
 }
 
 .quiz-result {
-  position: relative;
-  overflow: hidden;
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 
-  .fireworks {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .firework {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    
-    &::before, &::after {
-      content: '';
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px 2px;
-      animation: explode 1.5s infinite;
-    }
-
-    &:nth-child(1) {
-      left: 20%;
-      top: -10%;
-      
-      &::before, &::after {
-        animation-delay: 0s;
-        background: #ff4444;
-      }
-    }
-
-    &:nth-child(2) {
-      left: 50%;
-      top: -5%;
-      
-      &::before, &::after {
-        animation-delay: 0.3s;
-        background: #42b983;
-      }
-    }
-
-    &:nth-child(3) {
-      left: 80%;
-      top: -8%;
-      
-      &::before, &::after {
-        animation-delay: 0.6s;
-        background: #2196F3;
-      }
-    }
-  }
-
-  .result-title {
-    animation: fadeInUp 0.8s ease-out;
+  h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 30px;
   }
 
   .result-content {
-    animation: fadeInUp 1s ease-out 0.3s both;
+    margin: 30px auto;
+    max-width: 600px;
 
-    .result-image {
-      animation: zoomIn 1.2s ease-out 0.5s both;
+    .result-image-container {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 20px;
+
+      .result-image {
+        max-width: 300px;
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+        animation: imageAppear 0.8s ease-out;
+        position: relative;
+        z-index: 1;
+      }
+
+      .sparkles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+      }
+
+      .sparkle {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        
+        &::before, &::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 70%);
+          animation: sparkleAnimation 2s infinite;
+        }
+
+        @for $i from 1 through 12 {
+          &:nth-child(#{$i}) {
+            $angle: ($i - 1) * 30deg;
+            $distance: 140px;
+            left: calc(50% + #{cos($angle) * $distance});
+            top: calc(50% + #{sin($angle) * $distance});
+            
+            &::before {
+              animation-delay: ($i * 0.1s);
+            }
+            
+            &::after {
+              animation-delay: ($i * 0.1s + 1s);
+            }
+          }
+        }
+      }
     }
 
-    h3 {
-      animation: fadeInUp 1s ease-out 0.7s both;
+    h2 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #2c3e50;
+      margin-bottom: 15px;
     }
 
     p {
-      animation: fadeInUp 1s ease-out 0.9s both;
+      font-size: 20px;
+      line-height: 1.6;
+      color: #333;
+      padding: 0 20px;
+      margin-bottom: 30px;
     }
+  }
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
   }
 
   .pill-button {
@@ -401,15 +431,14 @@ const shareResult = (platform) => {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 12px 30px;
+    padding: 12px 40px;
     border: none;
-    border-radius: 50px; // 藥丸形狀
+    border-radius: 50px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin: 10px;
-    min-width: 200px;
+    min-width: 250px;
     color: white;
 
     .share-icon {
@@ -445,11 +474,135 @@ const shareResult = (platform) => {
     }
   }
 
-  .share-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
+  @media (max-width: 768px) {
+    padding: 30px 15px;
+    margin: 0 15px;
+
+    h2 {
+      font-size: 26px;
+    }
+
+    .result-content {
+      .result-image-container {
+        .result-image {
+          max-width: 250px;
+        }
+        
+        .sparkle {
+          width: 15px;
+          height: 15px;
+          
+          @for $i from 1 through 12 {
+            &:nth-child(#{$i}) {
+              $distance: 120px;
+              $angle: ($i - 1) * 30deg;
+              left: calc(50% + #{cos($angle) * $distance});
+              top: calc(50% + #{sin($angle) * $distance});
+            }
+          }
+        }
+      }
+
+      .result-image-container {
+        .result-image {
+          max-width: 250px;
+        }
+        
+        .sparkle {
+          width: 15px;
+          height: 15px;
+          
+          @for $i from 1 through 12 {
+            &:nth-child(#{$i}) {
+              $distance: 120px;
+              $angle: ($i - 1) * 30deg;
+              left: calc(50% + #{cos($angle) * $distance});
+              top: calc(50% + #{sin($angle) * $distance});
+            }
+          }
+        }
+      }
+
+      .button-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .pill-button {
+        width: 90%;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    }
+
+    .pill-button {
+      width: 80%;
+      max-width: 300px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px 10px;
+    margin: 0 10px;
+
+    h2 {
+      font-size: 22px;
+    }
+
+    .result-content {
+      .result-image-container {
+        .result-image {
+          max-width: 200px;
+        }
+        
+        .sparkle {
+          width: 12px;
+          height: 12px;
+          
+          @for $i from 1 through 12 {
+            &:nth-child(#{$i}) {
+              $distance: 100px;
+              $angle: ($i - 1) * 30deg;
+              left: calc(50% + #{cos($angle) * $distance});
+              top: calc(50% + #{sin($angle) * $distance});
+            }
+          }
+        }
+      }
+
+      .result-image-container {
+        .result-image {
+          max-width: 200px;
+        }
+        
+        .sparkle {
+          width: 12px;
+          height: 12px;
+          
+          @for $i from 1 through 12 {
+            &:nth-child(#{$i}) {
+              $distance: 100px;
+              $angle: ($i - 1) * 30deg;
+              left: calc(50% + #{cos($angle) * $distance});
+              top: calc(50% + #{sin($angle) * $distance});
+            }
+          }
+        }
+      }
+
+      .pill-button {
+        width: 100%;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-width: 200px;
+
+        .share-icon {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
   }
 }
 
@@ -508,7 +661,7 @@ const shareResult = (platform) => {
   }
 
   .quiz-result {
-    .share-buttons {
+    .button-container {
       flex-direction: column;
       align-items: center;
       
@@ -517,6 +670,28 @@ const shareResult = (platform) => {
         max-width: 300px;
       }
     }
+  }
+}
+
+@keyframes imageAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sparkleAnimation {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style> 
